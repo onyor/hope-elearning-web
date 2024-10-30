@@ -10,6 +10,7 @@ export async function enrollCourse(courseId: number, revalidate?: string) {
 
   const url = `${API_URL_LOCAL}/enrollments/${courseId}`;
 
+  console.log("Session", session);
   const resp = await fetch(url, {
     method: "POST",
     headers: {

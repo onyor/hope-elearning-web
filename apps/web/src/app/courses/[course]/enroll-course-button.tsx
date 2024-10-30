@@ -8,7 +8,7 @@ import { selectUser } from "@elearning/global-store/slices";
 import { Course } from "@elearning/lib/models";
 import { LoaderCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { ReactNode, useContext, useState } from "react";
+import { ReactNode, useState } from "react";
 
 export default function EnrollCourseButton({
   course,

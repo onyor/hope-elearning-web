@@ -104,7 +104,7 @@ pnpm dev
 	<img src="images/bmc-button.png" width="200">
 </a>
 <br/>
-<br/>
+<br/>*
 
 ## Screenshots
 

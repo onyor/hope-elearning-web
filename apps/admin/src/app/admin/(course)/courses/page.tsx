@@ -75,6 +75,7 @@ export default async function Courses(props: Props) {
     return <span className="text-primary text-sm font-medium">Published</span>;
   };
 
+
   return (
     <>
       <div className="flex justify-between mb-4">

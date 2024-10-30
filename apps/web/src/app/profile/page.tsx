@@ -1,6 +1,12 @@
 import { API_URL_LOCAL } from "@/lib/constants";
 import { validateResponse } from "@/lib/validate-response";
-import { Button, Card, CardContent, ProfileAvatar, Separator } from "@elearning/ui";
+import {
+  Button,
+  Card,
+  CardContent,
+  ProfileAvatar,
+  Separator,
+} from "@elearning/ui";
 import { User, UserMeta } from "@elearning/lib/models";
 import { formatNumber } from "@elearning/lib/utils";
 import { cookies } from "next/headers";
@@ -36,8 +42,10 @@ const getUserMeta = async () => {
 export default async function Profile() {
   const userPromise = getUser();
   const metaPromise = getUserMeta();
-
+  
   const [user, meta] = await Promise.all([userPromise, metaPromise]);
+  
+  console.log("User", user);
 
   return (
     <Card className="shadow-none mb-3">

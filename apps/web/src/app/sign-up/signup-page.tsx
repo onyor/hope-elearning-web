@@ -4,13 +4,20 @@ import { applyAuthCookies } from "@/lib/actions";
 import { firebaseAuth } from "@/lib/firebase.config";
 import { parseErrorResponse } from "@/lib/parse-error-response";
 import { Input, PasswordInput } from "@elearning/ui/forms";
-import { Alert, Button, Card, CardContent, CardFooter, Separator } from "@elearning/ui";
+import {
+  Alert,
+  Button,
+  Card,
+  CardContent,
+  CardFooter,
+  Separator,
+} from "@elearning/ui";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-    createUserWithEmailAndPassword,
-    inMemoryPersistence,
-    sendEmailVerification,
-    updateProfile,
+  createUserWithEmailAndPassword,
+  inMemoryPersistence,
+  sendEmailVerification,
+  updateProfile,
 } from "firebase/auth";
 import { LoaderCircle } from "lucide-react";
 import Image from "next/image";
@@ -58,11 +65,14 @@ function SignUpPage() {
       setError(undefined);
       const auth = firebaseAuth;
       auth.setPersistence(inMemoryPersistence);
+      console.log("resultBefore");
       const result = await createUserWithEmailAndPassword(
         auth,
         values.email,
         values.password
       );
+
+      console.log("result", result);
       sendEmailVerification(result.user);
       await updateProfile(result.user, {
         displayName: values.nickname,

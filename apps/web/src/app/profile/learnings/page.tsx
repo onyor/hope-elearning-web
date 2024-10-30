@@ -25,6 +25,7 @@ const getEnrollments = async ({ searchParams }: Props) => {
 
   const url = `${API_URL_LOCAL}/profile/enrollments${query}`;
 
+  console.log("token", cookies().toString());
   const resp = await fetch(url, {
     headers: {
       Cookie: cookies().toString(),
