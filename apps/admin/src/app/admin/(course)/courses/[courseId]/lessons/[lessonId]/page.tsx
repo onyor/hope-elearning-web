@@ -7,7 +7,6 @@ import LessonEditPage from "./lesson-edit-page";
 
 const getLesson = async (courseId: string, lessonId: string) => {
   const url = `${API_URL_LOCAL}/admin/courses/${courseId}/lessons/${lessonId}`;
-
   const resp = await fetch(url, {
     headers: {
       Cookie: cookies().toString(),

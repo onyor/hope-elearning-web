@@ -30,6 +30,7 @@ import LessonDeleteAlert from "./lesson-delete-alert";
 import LessonSettingDialog from "./lesson-setting-dialog";
 import QuizListing from "./quiz-listing";
 import { BASE_URL } from "@/lib/constants";
+import VideoUploader from "./video-uploader"; // Video yükleyici bileşeni eklendi
 
 const schema = z.object({
   id: z.number(),
@@ -43,19 +44,28 @@ type LessonForm = z.infer<typeof schema>;
 
 export default function LessonEditPage({ lesson }: { lesson: Lesson }) {
   const [data, setData] = useState(lesson);
-
   const [isStale, setStale] = useState(false);
   const [isSaving, setSaving] = useState(false);
-
   const [openSetting, setOpenSetting] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [html, setHtml] = useState<string | null>(lesson.html || null);
+  const [lexical, setLexical] = useState<string | null>(lesson.lexical || null);
 
   const auditRef = useRef<Audit>();
   const staleRef = useRef(false);
   const savingRef = useRef(false);
   const editorRef = useRef<TiptapEditor>();
-
   const { toast } = useToast();
+
+  const handleVideoUpload = (file: File) => {
+    setVideoFile(file); // Dosyayı state içine al
+
+    // Video yüklendiğinde html ve lexical değerlerini güncelle
+    const videoUrl = "http://localhost:5050/video"; // Test URL
+    setLexical(JSON.stringify({ type: "video", source: videoUrl }));
+    setHtml(`<video src="${videoUrl}" controls></video>`);
+  };
 
   const { control, setValue, getValues } = useForm<LessonForm>({
     resolver: zodResolver(schema),
@@ -95,17 +105,20 @@ export default function LessonEditPage({ lesson }: { lesson: Lesson }) {
       const audit = auditRef.current;
       const editor = editorRef.current;
 
-      const json = editor?.getJSON();
-      const html = editor?.getHTML();
-      const wordCount = editor?.storage.characterCount.words() ?? 0;
+      // Text tipi içerikler için kaydetme işlemi
+      if (lesson.type === "text" && editor) {
+        const json = editor.getJSON();
+        const htmlContent = editor.getHTML();
+        setLexical(json ? JSON.stringify(json) : null);
+        setHtml(htmlContent);
+      }
 
       const body = {
         ...values,
         courseId: lesson.chapter?.course?.id,
         slug: !values.slug?.trim() ? lesson.slug : values.slug,
-        lexical: json ? JSON.stringify(json) : undefined,
+        lexical: lexical,
         html: html,
-        wordCount: wordCount,
         updatedAt: audit?.updatedAt,
       };
 
@@ -114,10 +127,8 @@ export default function LessonEditPage({ lesson }: { lesson: Lesson }) {
       const result = await updateLesson(lesson.chapter?.course?.id ?? 0, body);
 
       auditRef.current = result.audit;
-
       setData(result);
 
-      // await new Promise((resolve) => setTimeout(() => resolve(true), 3000));
       if (lesson.chapter?.course?.status === "published") {
         toast({
           title: "Success",
@@ -163,8 +174,23 @@ export default function LessonEditPage({ lesson }: { lesson: Lesson }) {
   };
 
   const content = () => {
+    const handleClearVideo = () => {
+      // Video kaldırıldığında html ve lexical alanlarını sıfırla
+      setLexical(null);
+      setHtml(null);
+      setVideoFile(null);
+    };
+
     if (lesson.type === "quiz") {
       return <QuizListing lesson={lesson} />;
+    } else if (lesson.type === "video") {
+      return (
+        <VideoUploader
+          onUpload={handleVideoUpload}
+          initialUrl={lesson.lexical ? JSON.parse(lesson.lexical).source : null} // DB'deki video URL'si
+          onClear={handleClearVideo} // Video kaldırma işlevi
+        />
+      );
     }
 
     return (
@@ -178,12 +204,6 @@ export default function LessonEditPage({ lesson }: { lesson: Lesson }) {
         }}
         onUpdate={(editor) => {
           editorRef.current = editor;
-          // const json = editor.getJSON();
-          // const html = editor.getHTML();
-          // const wordCount = editor.storage.characterCount.words();
-          // setValue("lexical", JSON.stringify(json));
-          // setValue("html", html);
-          // setValue("wordCount", wordCount);
           if (lesson.chapter?.course?.status === "draft") {
             debouncedUpdate(undefined);
           }
@@ -263,25 +283,23 @@ export default function LessonEditPage({ lesson }: { lesson: Lesson }) {
               <Controller
                 control={control}
                 name="title"
-                render={({ field }) => {
-                  return (
-                    <TitleInput
-                      placeholder="Lesson title"
-                      spellCheck={false}
-                      maxLength={2000}
-                      value={field.value ?? ""}
-                      onChange={(evt) => {
-                        field.onChange(evt);
-                        const value = evt.target.value;
-                        const slug = setStringToSlug(value);
-                        setValue("slug", slug);
-                        if (lesson.chapter?.course?.status === "draft") {
-                          debouncedUpdate(undefined);
-                        }
-                      }}
-                    />
-                  );
-                }}
+                render={({ field }) => (
+                  <TitleInput
+                    placeholder="Lesson title"
+                    spellCheck={false}
+                    maxLength={2000}
+                    value={field.value ?? ""}
+                    onChange={(evt) => {
+                      field.onChange(evt);
+                      const value = evt.target.value;
+                      const slug = setStringToSlug(value);
+                      setValue("slug", slug);
+                      if (lesson.chapter?.course?.status === "draft") {
+                        debouncedUpdate(undefined);
+                      }
+                    }}
+                  />
+                )}
               />
             </div>
             {content()}

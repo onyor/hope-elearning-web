@@ -3,7 +3,13 @@
 import { createLesson, updateLesson } from "@/lib/actions";
 import { parseErrorResponse } from "@/lib/parse-error-response";
 import { Input, Select } from "@elearning/ui/forms";
-import { Button, DialogClose, DialogFooter, Switch, useToast } from "@elearning/ui";
+import {
+  Button,
+  DialogClose,
+  DialogFooter,
+  Switch,
+  useToast,
+} from "@elearning/ui";
 import { Chapter, Course, Lesson, LessonType } from "@elearning/lib/models";
 import { setStringToSlug } from "@elearning/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -136,6 +142,7 @@ function LessonEdit({
         >
           <option value="text">Text</option>
           <option value="quiz">Quiz</option>
+          <option value="video">Video</option>
         </Select>
 
         <Controller

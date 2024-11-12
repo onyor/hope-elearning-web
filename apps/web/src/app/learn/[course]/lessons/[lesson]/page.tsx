@@ -7,7 +7,7 @@ import ResumeCoursePage from "./resume-course-page";
 
 const getLesson = async (slug: string) => {
   const url = `${API_URL_LOCAL}/enrollments/${slug}/lesson`;
-
+  console.log("slug", slug);
   const resp = await fetch(url, {
     headers: {
       Cookie: cookies().toString(),
