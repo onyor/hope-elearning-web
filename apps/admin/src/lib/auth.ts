@@ -5,6 +5,7 @@ import * as jose from "jose";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { randomBytes } from "crypto";
 
 interface SessionType {
   userId: string;
@@ -29,7 +30,7 @@ export async function getSession(): Promise<SessionType> {
 
   try {
     payload = jose.decodeJwt(accessToken);
-  // eslint-disable-next-line no-empty
+    // eslint-disable-next-line no-empty
   } catch (error) {}
 
   if (!payload) {
@@ -75,6 +76,15 @@ export async function getSession(): Promise<SessionType> {
     cookieStore.set({
       name: "refresh_token",
       value: refreshToken,
+      httpOnly: true,
+      maxAge: 2592000,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    });
+
+    cookieStore.set({
+      name: "client_type",
+      value: "49^LY=sf0TFn",
       httpOnly: true,
       maxAge: 2592000,
       secure: process.env.NODE_ENV === "production",

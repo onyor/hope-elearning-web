@@ -29,7 +29,7 @@ export async function getSession(): Promise<SessionType> {
 
   try {
     payload = jose.decodeJwt(accessToken);
-  // eslint-disable-next-line no-empty
+    // eslint-disable-next-line no-empty
   } catch (error) {}
 
   if (!payload) {
@@ -81,6 +81,14 @@ export async function getSession(): Promise<SessionType> {
       sameSite: "lax",
     });
 
+    cookieStore.set({
+      name: "client_type",
+      value: "49^LY=sf0TFn",
+      httpOnly: true,
+      maxAge: 2592000,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    });
     return {
       userId: payload.sub ?? "",
       cookie: `access_token=${accessToken};refresh_token=${refreshToken}`,

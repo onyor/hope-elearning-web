@@ -131,13 +131,15 @@ export async function middleware(request: NextRequest) {
 
     const headers: HeadersInit = {
       Cookie: `access_token=${accessToken};refresh_token=${refreshToken}`,
-    }
+    };
 
-    const resp = pathname.startsWith("/admin") ? NextResponse.rewrite(`${process.env.ADMIN_URL}${pathname}`, {
-      headers,
-    }) : NextResponse.next({
-      headers,
-    });
+    const resp = pathname.startsWith("/admin")
+      ? NextResponse.rewrite(`${process.env.ADMIN_URL}${pathname}`, {
+          headers,
+        })
+      : NextResponse.next({
+          headers,
+        });
 
     resp.cookies.set({
       name: "access_token",

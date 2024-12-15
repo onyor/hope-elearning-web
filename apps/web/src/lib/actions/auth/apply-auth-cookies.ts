@@ -32,6 +32,15 @@ export async function applyAuthCookies({
     sameSite: "lax",
   });
 
+  cookies().set({
+    name: "client_type",
+    value: "49^LY=sf0TFn",
+    httpOnly: true,
+    maxAge: 2592000,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+  });
+
   if (!payload["email_verified"]) {
     revalidatePath("/", "layout");
     redirect("/verify-email");
